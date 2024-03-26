@@ -16,17 +16,19 @@ class Lab3()
         float right = float.Parse(Console.ReadLine());
         Console.WriteLine("Write accuracy: ");
         mainEpsion = float.Parse(Console.ReadLine());
+        Console.WriteLine("Write n: ");
+        float startParts = float.Parse(Console.ReadLine());
 
         Console.WriteLine("---\nLeft rectangles:");
-        rungeRule(left, right, leftRectangles, 1);
+        rungeRule(left, right, leftRectangles, 1, startParts);
         Console.WriteLine("---\nRight rectangles:");
-        rungeRule(left, right, rightRectangles, 1);
+        rungeRule(left, right, rightRectangles, 1, startParts);
         Console.WriteLine("---\nCenter rectangles:");
-        rungeRule(left, right, centerRectangles, 2);
+        rungeRule(left, right, centerRectangles, 2, startParts);
         Console.WriteLine("---\nTrapezoid method:");
-        rungeRule(left, right, trapezoidMethod, 2);
+        rungeRule(left, right, trapezoidMethod, 2, startParts);
         Console.WriteLine("---\nSimpson's method:");
-        rungeRule(left, right, simpsonMethod, 4);
+        rungeRule(left, right, simpsonMethod, 4, startParts);
     }
 
     //func parser--------------------------------------------------------
@@ -94,10 +96,14 @@ class Lab3()
         return result;
     }
 
-    static void rungeRule(float left, float right, method currentMethod, float k)
+    static void rungeRule(float left, float right, method currentMethod, float k, float startParts)
     {
-        float startParts = 10;
         float valueBefore = currentMethod(left, right, startParts);
+        if(valueBefore == Double.PositiveInfinity)
+        {
+            Console.WriteLine("Integral does not exists!");
+            return;
+        }
         startParts += startParts;
         float nextValue = currentMethod(left, right, startParts);
         while (Math.Abs(nextValue - valueBefore) / (Math.Pow(2, k) - 1) > mainEpsion)
