@@ -3,43 +3,49 @@ using System.Drawing;
 //ohhhhh so bad code here))
 class Lab4
 {
-    //Dictionary<float, float> values = new Dictionary<float, float>();
+    static Dictionary<float, float> values = new Dictionary<float, float>();
     public static void doAlgos()
     {
-        Console.WriteLine("f(x): 4*x / (x^4 + 12)");
-        //drawGraphic(function, "main.jpg");
-        Console.WriteLine("Write start value:"); 
-        startValue = float.Parse(Console.ReadLine());
-        Console.WriteLine("Write end value:");
-        endValue = float.Parse(Console.ReadLine());
-        step = (endValue - startValue) / stepAmount;
-        drawGraphic(function, "grapics/main.jpg");
+        // Console.WriteLine("f(x): 4*x / (x^4 + 12)");
+        // //drawGraphic(function, "main.jpg");
+        // Console.WriteLine("Write start value:"); 
+        // startValue = float.Parse(Console.ReadLine());
+        // Console.WriteLine("Write end value:");
+        // endValue = float.Parse(Console.ReadLine());
+        // step = (endValue - startValue) / stepAmount;
+        // drawGraphic(function, "grapics/main.jpg");
+
+        Console.WriteLine("How many points?");
+        int steps = int.Parse(Console.ReadLine());
+        Console.WriteLine("format: [x] [y]");
+        while (steps > 0)
+        {
+            string point = Console.ReadLine();
+            values.Add(float.Parse(point.Split(" ")[0]) == 0 ? 0.0001F : float.Parse(point.Split(" ")[0]), float.Parse(point.Split(" ")[1]));
+            steps--;
+        }
 
         float sumX = 0;
         float sumY = 0;
-        float x = startValue;
         //pirson's coeff
-        for (int i = 0; i < step; i++)
+        foreach (var currPoint in values)
         {
-            sumX += x;
-            sumY += function(x);
-            x += step;
+            sumX += currPoint.Key;
+            sumY += currPoint.Value;
         }
         float up = 0;
         float down = 0;
-        x = startValue;
-        for (int i = 0; i < step; i++)
+        foreach (var currPoint in values)
         {
-            up += (x - sumX) * (function(x) - sumY);
-            down += (float)Math.Pow((x - sumX), 2) + (float)Math.Pow((function(x) - sumY), 2);
-            x += step;
+            up += (currPoint.Key - sumX) * (currPoint.Value - sumY);
+            down += (float)Math.Pow((currPoint.Key - sumX), 2) + (float)Math.Pow((currPoint.Value - sumY), 2);
         }
         float pirsonCoeff = up / (float)(Math.Sqrt(down));
         Console.WriteLine("Pirson's coefficient: " + pirsonCoeff);
-        Console.WriteLine(pirsonCoeff < 0.3F ? "Low connection" 
+        Console.WriteLine(pirsonCoeff < 0.3F ? "Low connection"
                         : pirsonCoeff < 0.5F ? "Pre-normal connection"
-                        : pirsonCoeff < 0.7F ? "Normal connection" 
-                        : pirsonCoeff < 0.9F ? "High connection" 
+                        : pirsonCoeff < 0.7F ? "Normal connection"
+                        : pirsonCoeff < 0.9F ? "High connection"
                         : "Very high connection");
 
 
@@ -49,35 +55,30 @@ class Lab4
 
         Console.WriteLine("------------------------");
         Console.WriteLine("Linear approximation");
-        LinearApprox(startValue, true);
+        LinearApprox(true);
         Console.WriteLine("------------------------");
         Console.WriteLine("Quadratic approximation");
-        QuadraticApprox(startValue);
+        QuadraticApprox();
         Console.WriteLine("------------------------");
         Console.WriteLine("Cube approximation");
-        CubeApprox(startValue);
+        CubeApprox();
         Console.WriteLine("------------------------");
         Console.WriteLine("Exponential approximation");
-        ExponentialApprox(startValue);
+        ExponentialApprox();
         Console.WriteLine("------------------------");
         Console.WriteLine("Logarithmic approximation");
-        LogApprox(startValue);
+        LogApprox();
         Console.WriteLine("------------------------");
         Console.WriteLine("Power approximation");
-        PowApprox(startValue);
+        PowApprox();
         Console.WriteLine("------------------------");
 
         Console.WriteLine("The best approximation is " + bestApproxName + " " + bestApproxValue);
-    }
 
-    static float startValue;
-    static float endValue;
-    static float step;
-    const float stepAmount = 10F;
-
-    static float function(float x)
-    {
-        return x * 4 / ((float)Math.Pow(x, 4) + 12);
+        foreach (var coeff in approxValues)
+        {
+            Console.WriteLine(coeff.Value + " " + coeff.Key);
+        }
     }
 
     delegate float Function(float x);
@@ -85,22 +86,21 @@ class Lab4
     static string bestApproxName = "";
     static float bestApproxValue = 0;
 
+    static Dictionary<float, string> approxValues = new Dictionary<float, string>();
+
     static float QuadraticDeviation(Function approx)
     {
-        float x = startValue;
-
         float result = 0;
 
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            result += (float)Math.Pow((approx(x) - function(x)), 2);
-            x += step;
+            result += (float)Math.Pow((approx(point.Key) - point.Value), 2);
         }
         return (float)Math.Sqrt((result / 2));
     }
 
 
-    static List<float> LinearApprox(float x, bool willPrint)
+    static List<float> LinearApprox(bool willPrint)
     {
         float sumX = 0;
         float sumY = 0;
@@ -108,14 +108,12 @@ class Lab4
         float sumXX = 0;
         float sumXY = 0;
 
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            sumX += x;
-            sumY += function(x);
-            sumXX += (x * x);
-            sumXY += (x * function(x));
-
-            x += step;
+            sumX += point.Key;
+            sumY += point.Value;
+            sumXX += (point.Key * point.Key);
+            sumXY += (point.Key * point.Value);
         }
 
         List<double[]> matrix = new List<double[]>();
@@ -127,7 +125,7 @@ class Lab4
         firstLine[0] = sumXX;
         firstLine[1] = sumX;
         secondLine[0] = sumX;
-        secondLine[1] = stepAmount;
+        secondLine[1] = values.Count;
 
         constants.Add(sumXY);
         constants.Add(sumY);
@@ -152,22 +150,18 @@ class Lab4
         if (willPrint)
         {
             //determ coeff
-            x = startValue;
             float determCoeff = 0;
             float allApprox = 0;
             float up = 0;
             float down = 0;
-            for (int i = 0; i < stepAmount; i++)
+            foreach (var point in values)
             {
-                up += (float)Math.Pow(function(x) - approx(x), 2);
-                allApprox += approx(x);
-                x += step;
+                up += (float)Math.Pow(point.Value - point.Key, 2);
+                allApprox += approx(point.Key);
             }
-            x = startValue;
-            for (int i = 0; i < stepAmount; i++)
+            foreach (var point in values)
             {
-                down += (float)Math.Pow(function(x) - allApprox, 2);
-                x += step;
+                down += (float)Math.Pow(point.Value - allApprox, 2);
             }
             determCoeff = 1 - (up / down);
             Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -179,13 +173,14 @@ class Lab4
                 bestApproxValue = determCoeff;
                 bestApproxName = "Linear";
             }
+            approxValues.Add(determCoeff, "Linear");
         }
 
         return solved;
     }
 
 
-    static void QuadraticApprox(float x)
+    static void QuadraticApprox()
     {
         float sumX = 0;
         float sumY = 0;
@@ -198,17 +193,15 @@ class Lab4
 
         float sumXXY = 0;
 
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            sumX += x;
-            sumY += function(x);
-            sumXX += (x * x);
-            sumXY += (x * function(x));
-            sumX3 += (float)Math.Pow(x, 3);
-            sumX4 += (float)Math.Pow(x, 4);
-            sumXXY += (x * x) * function(x);
-
-            x += step;
+            sumX += point.Key;
+            sumY += point.Value;
+            sumXX += (point.Key * point.Key);
+            sumXY += (point.Key * point.Value);
+            sumX3 += (float)Math.Pow(point.Key, 3);
+            sumX4 += (float)Math.Pow(point.Key, 4);
+            sumXXY += (point.Key * point.Key) * point.Value;
         }
 
         List<double[]> matrix = new List<double[]>();
@@ -218,7 +211,7 @@ class Lab4
         double[] secondLine = new double[3];
         double[] thirdLine = new double[3];
 
-        firstLine[0] = stepAmount;
+        firstLine[0] = values.Count;
         firstLine[1] = sumX;
         firstLine[2] = sumXX;
         secondLine[0] = sumX;
@@ -251,22 +244,19 @@ class Lab4
         Console.WriteLine("Quadratic deviation: " + QuadraticDeviation(approx));
 
         //determ coeff
-        x = startValue;
         float determCoeff = 0;
         float allApprox = 0;
         float up = 0;
         float down = 0;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            up += (float)Math.Pow(function(x) - approx(x), 2);
-            allApprox += approx(x);
-            x += step;
+            up += (float)Math.Pow(point.Value - approx(point.Key), 2);
+            allApprox += approx(point.Key);
         }
-        x = startValue;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            down += (float)Math.Pow(function(x) - allApprox, 2);
-            x += step;
+            down += (float)Math.Pow(point.Value - allApprox, 2);
+
         }
         determCoeff = 1 - (up / down);
         Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -278,9 +268,10 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Quadratic";
         }
+        approxValues.Add(determCoeff, "Quadratic");
     }
 
-    static void CubeApprox(float x)
+    static void CubeApprox()
     {
         float sumX = 0;
         float sumY = 0;
@@ -298,9 +289,10 @@ class Lab4
 
         float sumX6 = 0;
 
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            float y = function(x);
+            float y = point.Value;
+            float x = point.Key;
             sumX += x;
             sumY += y;
             sumXX += (x * x);
@@ -312,8 +304,6 @@ class Lab4
             sumX5 += (float)Math.Pow(x, 5);
             //sumX4Y += (float)Math.Pow(x, 4)*y;
             sumX6 += (float)Math.Pow(x, 6);
-
-            x += step;
         }
 
         List<double[]> matrix = new List<double[]>();
@@ -324,7 +314,7 @@ class Lab4
         double[] thirdLine = new double[4];
         double[] forthLine = new double[4];
 
-        firstLine[0] = stepAmount;
+        firstLine[0] = values.Count;
         firstLine[1] = sumX;
         firstLine[2] = sumXX;
         firstLine[3] = sumX3;
@@ -366,22 +356,18 @@ class Lab4
         Console.WriteLine("Quadratic deviation: " + QuadraticDeviation(approx));
 
         //determ coeff
-        x = startValue;
         float determCoeff = 0;
         float allApprox = 0;
         float up = 0;
         float down = 0;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            up += (float)Math.Pow(function(x) - approx(x), 2);
-            allApprox += approx(x);
-            x += step;
+            up += (float)Math.Pow(point.Value - approx(point.Key), 2);
+            allApprox += approx(point.Key);
         }
-        x = startValue;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            down += (float)Math.Pow(function(x) - allApprox, 2);
-            x += step;
+            down += (float)Math.Pow(point.Value - allApprox, 2);
         }
         determCoeff = 1 - (up / down);
         Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -393,11 +379,12 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Cube";
         }
+        approxValues.Add(determCoeff, "Cube");
     }
 
-    static void ExponentialApprox(float x)
+    static void ExponentialApprox()
     {
-        List<float> solved = LinearApprox(x, false);
+        List<float> solved = LinearApprox(false);
 
         Function approx = (x) => { return (solved[0] * (float)Math.Exp(solved[1] * x)); };
 
@@ -406,22 +393,18 @@ class Lab4
         //Console.WriteLine("Quadratic deviation: " + QuadraticDeviation(approx));
 
         //determ coeff
-        x = startValue;
         float determCoeff = 0;
         float allApprox = 0;
         float up = 0;
         float down = 0;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            up += (float)Math.Pow(function(x) - approx(x), 2);
-            allApprox += approx(x);
-            x += step;
+            up += (float)Math.Pow(point.Value - approx(point.Key), 2);
+            allApprox += approx(point.Key);
         }
-        x = startValue;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            down += (float)Math.Pow(function(x) - allApprox, 2);
-            x += step;
+            down += (float)Math.Pow(point.Value - allApprox, 2);
         }
         determCoeff = 1 - (up / down);
         Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -433,11 +416,12 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Exponential";
         }
+        approxValues.Add(determCoeff, "Exponential");
     }
 
-    static void LogApprox(float x)
+    static void LogApprox()
     {
-        List<float> solved = LinearApprox(x, false);
+        List<float> solved = LinearApprox(false);
 
         Function approx = (x) => { return (solved[0] * (float)Math.Log(x) + solved[1]); };
 
@@ -446,22 +430,19 @@ class Lab4
         //Console.WriteLine("Quadratic deviation: " + QuadraticDeviation(approx));
 
         //determ coeff
-        x = startValue == 0 ? 0.001F : startValue;
         float determCoeff = 0;
         float allApprox = 0;
         float up = 0;
         float down = 0;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            up += (float)Math.Pow(function(x) - approx(x), 2);
-            allApprox += approx(x);
-            x += step;
+            up += (float)Math.Pow(point.Value - approx(point.Key), 2);
+            allApprox += approx(point.Key);
+
         }
-        x = startValue;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            down += (float)Math.Pow(function(x) - allApprox, 2);
-            x += step;
+            down += (float)Math.Pow(point.Value - allApprox, 2);
         }
         determCoeff = 1 - (up / down);
         Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -473,11 +454,12 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Logarithmic";
         }
+        approxValues.Add(determCoeff, "Logatithmic");
     }
 
-    static void PowApprox(float x)
+    static void PowApprox()
     {
-        List<float> solved = LinearApprox(x, false);
+        List<float> solved = LinearApprox(false);
 
         Function approx = (x) => { return (solved[0] * (float)Math.Pow(x, solved[1])); };
 
@@ -486,22 +468,18 @@ class Lab4
         //Console.WriteLine("Quadratic deviation: " + QuadraticDeviation(approx));
 
         //determ coeff
-        x = startValue;
         float determCoeff = 0;
         float allApprox = 0;
         float up = 0;
         float down = 0;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            up += (float)Math.Pow(function(x) - approx(x), 2);
-            allApprox += approx(x);
-            x += step;
+            up += (float)Math.Pow(point.Value - approx(point.Key), 2);
+            allApprox += approx(point.Key);
         }
-        x = startValue;
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            down += (float)Math.Pow(function(x) - allApprox, 2);
-            x += step;
+            down += (float)Math.Pow(point.Value - allApprox, 2);
         }
         determCoeff = 1 - (up / down);
         Console.WriteLine("Coefficient of determination: " + determCoeff);
@@ -513,6 +491,7 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Power";
         }
+        approxValues.Add(determCoeff, "Power");
     }
 
 
@@ -624,17 +603,30 @@ class Lab4
         //g.ScaleTransform(1000, 1000);
         //g.DrawLine(Pens.Black, 0, 0, -100, -100);
 
-        float start = startValue == 0 ? 0.00001F : startValue;
+        float xBefore = 0;
+        float yBefore = 0;
+        bool isFirstTime = true;
 
-        for (int i = 0; i < stepAmount; i++)
+        foreach (var point in values)
         {
-            Console.WriteLine("x: " + (decimal) start);
-            Console.WriteLine("y: " + (decimal) function(start));
-            Console.WriteLine("phi: " + (decimal) mainFunc(start));
-            Console.WriteLine("epsilon: " + (decimal) (function(start) - mainFunc(start)));
-            float result = mainFunc(start);
-            graphic.DrawLine(Pens.Black, start * 100, result * 100, (start + step) * 100, mainFunc(start + step) * 100);
-            start += step;
+            Console.WriteLine("x: " + (decimal)point.Key);
+            Console.WriteLine("y: " + (decimal)point.Value);
+            Console.WriteLine("phi: " + (decimal)mainFunc(point.Key));
+            Console.WriteLine("epsilon: " + (decimal)(point.Value - mainFunc(point.Key)));
+            if (isFirstTime)
+            {
+                xBefore = point.Key;
+                yBefore = mainFunc(point.Key);
+                isFirstTime = false;
+            }
+            else
+            {
+                float result = mainFunc(point.Key);
+                graphic.DrawLine(Pens.Black, xBefore * 100, yBefore * 100, (point.Key) * 100, mainFunc(point.Key) * 100);
+
+                xBefore = point.Key;
+                yBefore = mainFunc(point.Key);
+            }
         }
 
         bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
