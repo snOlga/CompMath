@@ -21,7 +21,9 @@ class Lab4
         while (steps > 0)
         {
             string point = Console.ReadLine();
-            values.Add(float.Parse(point.Split(" ")[0]) == 0 ? 0.0001F : float.Parse(point.Split(" ")[0]), float.Parse(point.Split(" ")[1]));
+            values.Add(
+                float.Parse(point.Split(" ")[0]) == 0 ? 0.001F : float.Parse(point.Split(" ")[0]), 
+                float.Parse(point.Split(" ")[1]) == 0 ? 0.001F : float.Parse(point.Split(" ")[1]));
             steps--;
         }
 
@@ -86,7 +88,7 @@ class Lab4
     static string bestApproxName = "";
     static float bestApproxValue = 0;
 
-    static Dictionary<float, string> approxValues = new Dictionary<float, string>();
+    static Dictionary<string, float> approxValues = new Dictionary<string, float>();
 
     static float QuadraticDeviation(Function approx)
     {
@@ -173,7 +175,7 @@ class Lab4
                 bestApproxValue = determCoeff;
                 bestApproxName = "Linear";
             }
-            approxValues.Add(determCoeff, "Linear");
+            approxValues.Add("Linear", determCoeff);
         }
 
         return solved;
@@ -268,7 +270,7 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Quadratic";
         }
-        approxValues.Add(determCoeff, "Quadratic");
+        approxValues.Add("Quadratic", determCoeff);
     }
 
     static void CubeApprox()
@@ -379,7 +381,7 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Cube";
         }
-        approxValues.Add(determCoeff, "Cube");
+        approxValues.Add("Cube", determCoeff);
     }
 
     static void ExponentialApprox()
@@ -416,14 +418,14 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Exponential";
         }
-        approxValues.Add(determCoeff, "Exponential");
+        approxValues.Add("Exponential", determCoeff);
     }
 
     static void LogApprox()
     {
         List<float> solved = LinearApprox(false);
 
-        Function approx = (x) => { return (solved[0] * (float)Math.Log(x) + solved[1]); };
+        Function approx = (x) => { return (solved[0] * (float)Math.Log(Math.Abs(x)) + solved[1]); };
 
         drawGraphic(approx, "grapics/log.jpg");
 
@@ -438,7 +440,6 @@ class Lab4
         {
             up += (float)Math.Pow(point.Value - approx(point.Key), 2);
             allApprox += approx(point.Key);
-
         }
         foreach (var point in values)
         {
@@ -454,14 +455,14 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Logarithmic";
         }
-        approxValues.Add(determCoeff, "Logatithmic");
+        approxValues.Add("Logatithmic", determCoeff);
     }
 
     static void PowApprox()
     {
         List<float> solved = LinearApprox(false);
 
-        Function approx = (x) => { return (solved[0] * (float)Math.Pow(x, solved[1])); };
+        Function approx = (x) => { return (solved[0] * (float)Math.Pow(Math.Abs(x), solved[1])); };
 
         drawGraphic(approx, "grapics/pow.jpg");
 
@@ -491,7 +492,7 @@ class Lab4
             bestApproxValue = determCoeff;
             bestApproxName = "Power";
         }
-        approxValues.Add(determCoeff, "Power");
+        approxValues.Add("Power", determCoeff);
     }
 
 
@@ -594,43 +595,43 @@ class Lab4
 
     static void drawGraphic(Function mainFunc, string fileName)
     {
-        Image bmp = new Bitmap(1000, 1000);
-        Graphics graphic = Graphics.FromImage(bmp);
-        graphic.Clear(Color.FromArgb(255, 255, 255));
-        graphic.TranslateTransform(500, 500);
-        graphic.DrawLine(Pens.Blue, -500, 0, 500, 0);
-        graphic.DrawLine(Pens.Blue, 0, -500, 0, 500);
-        //g.ScaleTransform(1000, 1000);
-        //g.DrawLine(Pens.Black, 0, 0, -100, -100);
+        // Image bmp = new Bitmap(1000, 1000);
+        // Graphics graphic = Graphics.FromImage(bmp);
+        // graphic.Clear(Color.FromArgb(255, 255, 255));
+        // graphic.TranslateTransform(500, 500);
+        // graphic.DrawLine(Pens.Blue, -500, 0, 500, 0);
+        // graphic.DrawLine(Pens.Blue, 0, -500, 0, 500);
+        // //g.ScaleTransform(1000, 1000);
+        // //g.DrawLine(Pens.Black, 0, 0, -100, -100);
 
-        float xBefore = 0;
-        float yBefore = 0;
-        bool isFirstTime = true;
+        // float xBefore = 0;
+        // float yBefore = 0;
+        // bool isFirstTime = true;
 
-        foreach (var point in values)
-        {
-            Console.WriteLine("x: " + (decimal)point.Key);
-            Console.WriteLine("y: " + (decimal)point.Value);
-            Console.WriteLine("phi: " + (decimal)mainFunc(point.Key));
-            Console.WriteLine("epsilon: " + (decimal)(point.Value - mainFunc(point.Key)));
-            if (isFirstTime)
-            {
-                xBefore = point.Key;
-                yBefore = mainFunc(point.Key);
-                isFirstTime = false;
-            }
-            else
-            {
-                float result = mainFunc(point.Key);
-                graphic.DrawLine(Pens.Black, xBefore * 100, yBefore * 100, (point.Key) * 100, mainFunc(point.Key) * 100);
+        // foreach (var point in values)
+        // {
+        //     Console.WriteLine("x: " + (decimal)point.Key);
+        //     Console.WriteLine("y: " + (decimal)point.Value);
+        //     Console.WriteLine("phi: " + mainFunc(point.Key));
+        //     Console.WriteLine("epsilon: " + (point.Value - mainFunc(point.Key)));
+        //     if (isFirstTime)
+        //     {
+        //         xBefore = point.Key;
+        //         yBefore = mainFunc(point.Key);
+        //         isFirstTime = false;
+        //     }
+        //     else
+        //     {
+        //         float result = mainFunc(point.Key);
+        //         graphic.DrawLine(Pens.Black, xBefore * 100, yBefore * 100, (point.Key) * 100, mainFunc(point.Key) * 100);
 
-                xBefore = point.Key;
-                yBefore = mainFunc(point.Key);
-            }
-        }
+        //         xBefore = point.Key;
+        //         yBefore = mainFunc(point.Key);
+        //     }
+        // }
 
-        bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+        // bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
-        bmp.Save(fileName);
+        // bmp.Save(fileName);
     }
 }
