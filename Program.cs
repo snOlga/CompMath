@@ -8,4 +8,6 @@
 
 //Lab3.doAlgos();
 
-Lab4.doAlgos();
+//Lab4.doAlgos();
+
+Lab5.doAlgos();
