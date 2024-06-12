@@ -5,14 +5,36 @@ public class Lab1
         List<double[]> matrix = new List<double[]>();
         List<double> constants = new List<double>();
 
-        Console.WriteLine("Write amount of matrix lines:");
+        //unused number
+        Console.ReadLine();
+
+        ///Console.WriteLine("Write amount of matrix lines:");
         int lines = int.Parse(Console.ReadLine());
 
-        Console.WriteLine("Write x coefficients as a matrix:");
+        //Console.WriteLine("Write error scale:");
+        double errorScaleConst = double.Parse(Console.ReadLine().Replace(".", ","));
+
+        //Console.WriteLine("Write matrix:");
         for (int i = 0; i < lines; i++)
         {
-            matrix.Add(Array.ConvertAll(Console.ReadLine().Split(" "), double.Parse));
+            string[] numbers = Console.ReadLine().Replace(".", ",").Split(" ");
+            try
+            {
+                matrix.Add(Array.ConvertAll(numbers[0..(numbers.Length - 1)], double.Parse));
+                constants.Add(double.Parse(numbers[numbers.Length - 1]));
+            }
+            catch (Exception)
+            {
+                //Console.WriteLine("Exeption");
+                i--;
+            }
         }
+
+        // Console.WriteLine("Write the column of matrix constants:");
+        // for (int i = 0; i < lines; i++)
+        // {
+        //     constants.Add(double.Parse(Console.ReadLine()));
+        // }
 
         //is matrix ok; if not - change lines if we can
         double errorScaleForOutput = 0;
@@ -73,20 +95,11 @@ public class Lab1
         }
         if (equalsAmount == matrix.Count)
         {
-            Console.WriteLine("That's incorrect matrix!");
+            //Console.WriteLine("That's incorrect matrix!");
             return;
         }
 
-        Console.WriteLine("Write the column of matrix constants:");
-        for (int i = 0; i < lines; i++)
-        {
-            constants.Add(double.Parse(Console.ReadLine()));
-        }
-
-        Console.WriteLine("Write error scale:");
-        double errorScaleConst = double.Parse(Console.ReadLine());
-
-        Console.WriteLine("------------------------");
+        //Console.WriteLine("------------------------");
 
         Dictionary<int, double[]> equations = new Dictionary<int, double[]>();
 
@@ -155,12 +168,13 @@ public class Lab1
             }
         }
 
-        Console.WriteLine("Iteration count is " + iterationCount);
+        //Console.WriteLine("Iteration count is " + iterationCount);
+
         //Console.WriteLine("Error scale is " + errorScaleForOutput);
 
         for (int xNumber = 1; xNumber <= rememberX.Count - 1; xNumber++)
         {
-            Console.WriteLine("x" + xNumber + " is " + (decimal)rememberX[xNumber][0] + ' ' + (decimal)rememberX[xNumber][1]);
+            Console.Write((decimal)rememberX[xNumber][0] + " ");
         }
     }
 }
