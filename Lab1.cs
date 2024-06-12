@@ -9,10 +9,36 @@ public class Lab1
         Console.ReadLine();
 
         ///Console.WriteLine("Write amount of matrix lines:");
-        int lines = int.Parse(Console.ReadLine());
+        bool hasExp = true;
+        int lines = 0;
+        while (hasExp)
+        {
+            try
+            {
+                lines = int.Parse(Console.ReadLine());
+                hasExp = false;
+            }
+            catch (Exception)
+            {
+                hasExp = true;
+            }
+        }
 
         //Console.WriteLine("Write error scale:");
-        double errorScaleConst = double.Parse(Console.ReadLine().Replace(".", ","));
+        hasExp = true;
+        double errorScaleConst = 0;
+        while (hasExp)
+        {
+            try
+            {
+                errorScaleConst = double.Parse(Console.ReadLine().Replace(".", ","));
+                hasExp = false;
+            }
+            catch (Exception)
+            {
+                hasExp = true;
+            }
+        }
 
         //Console.WriteLine("Write matrix:");
         for (int i = 0; i < lines; i++)
